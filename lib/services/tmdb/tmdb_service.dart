@@ -1,5 +1,5 @@
+// import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter/foundation.dart';
 import 'package:movies/types/movie.dart';
 import 'package:movies/types/actor.dart';
 import 'package:http/http.dart' as http;
@@ -30,7 +30,6 @@ List<Actor> parseActors(String resBody) {
       })
       .toList()
       .sublist(0, 10);
-  print(lol);
   return lol;
 }
 
@@ -73,8 +72,7 @@ class TmdbService {
     try {
       var response = await http.get(Uri.parse(url), headers: headers);
       String resBody = utf8.decode(response.bodyBytes);
-      // return parseMovies(resBody);
-      return [];
+      return parseMovies(resBody);
     } catch (error) {
       return Future.error(error);
     }
@@ -85,8 +83,7 @@ class TmdbService {
     try {
       var response = await http.get(Uri.parse(url), headers: headers);
       String resBody = utf8.decode(response.bodyBytes);
-      // return parseMovies(resBody);
-      return [];
+      return parseMovies(resBody);
     } catch (error) {
       return Future.error("Can not get Movie List data");
     }
