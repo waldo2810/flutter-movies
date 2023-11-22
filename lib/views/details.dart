@@ -1,11 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:movies/types/actor.dart';
-import 'package:movies/types/movie.dart';
+import 'package:flutter/material.dart';
 import 'package:movies/services/tmdb/tmdb_service.dart';
-import 'package:movies/widgets/section.dart';
-import 'package:movies/widgets/actor_tile.dart';
-import 'package:movies/widgets/content_tile.dart';
+import 'package:movies/types/movie.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -17,28 +13,6 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   final _service = TmdbService();
   final ScrollController _sliverScrollController = ScrollController();
-
-  Widget _actorList(actors) {
-    return SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: actors.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ActorTile(actors[index]);
-          },
-          padding: const EdgeInsets.all(5),
-        ));
-  }
-
-  Widget _contentList(movies) {
-    return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: movies.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ContentTile(movies[index]);
-        });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +45,6 @@ class _DetailScreenState extends State<DetailScreen> {
             return FutureBuilder(
               future: Future.wait([
                 _service.requestMovie(arguments['id']),
-                _service.requestCredits(arguments['id']),
-                _service.requestSimilar(arguments['id']),
-                _service.requestRecommendations(arguments['id']),
               ]),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (!snapshot.hasData) {
@@ -88,9 +59,6 @@ class _DetailScreenState extends State<DetailScreen> {
                           ]));
                 } else {
                   final movie = snapshot.data?[0] as Movie;
-                  final actors = snapshot.data?[1] as List<Actor>;
-                  final similarMovies = snapshot.data?[2] as List<Movie>;
-                  final recommendations = snapshot.data?[3] as List<Movie>;
 
                   return Padding(
                       padding: const EdgeInsets.only(top: 32),
@@ -123,32 +91,6 @@ class _DetailScreenState extends State<DetailScreen> {
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 5,
                               )),
-                          Container(
-                            margin: const EdgeInsets.only(top: 16, bottom: 16),
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Section(
-                                'Casting',
-                                SizedBox(
-                                    height: 130, child: _actorList(actors))),
-                          ),
-                          if (similarMovies.isNotEmpty)
-                            Container(
-                                margin: const EdgeInsets.only(bottom: 32),
-                                padding: const EdgeInsets.only(top: 16),
-                                child: Section(
-                                    "Similar Movies",
-                                    SizedBox(
-                                        height: 130,
-                                        child: _contentList(similarMovies)))),
-                          if (recommendations.isNotEmpty)
-                            Container(
-                                margin: const EdgeInsets.only(bottom: 64),
-                                padding: const EdgeInsets.only(top: 16),
-                                child: Section(
-                                    "Recommendations",
-                                    SizedBox(
-                                        height: 130,
-                                        child: _contentList(recommendations)))),
                         ],
                       ));
                 }

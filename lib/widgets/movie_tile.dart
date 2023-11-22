@@ -28,7 +28,8 @@ class _MovieTileState extends State<MovieTile> {
                     'title': widget._movie.title,
                     'posterPath': widget._movie.posterPath,
                     'backdropPath': widget._movie.backdropPath,
-                    'voteAvg': widget._movie.voteAvg
+                    'voteAvg': widget._movie.voteAvg,
+                    'overview': widget._movie.overview,
                   });
                 },
                 child: Row(
@@ -60,8 +61,9 @@ class _MovieTileState extends State<MovieTile> {
                                                         Widget child,
                                                         ImageChunkEvent?
                                                             loadingProgress) {
-                                                  if (loadingProgress == null)
+                                                  if (loadingProgress == null) {
                                                     return child;
+                                                  }
                                                   return Center(
                                                     child:
                                                         CircularProgressIndicator(
