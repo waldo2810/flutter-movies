@@ -21,26 +21,17 @@ List<Movie> parseMovies(String resBody) {
   }).toList();
 }
 
-List<Actor> parseActors(String resBody) {
-  final json = jsonDecode(resBody);
-  final results = json['cast'];
-  var lol = (results as List)
-      .map<Actor>((actor) {
-        return Actor.fromJson(actor);
-      })
-      .toList()
-      .sublist(0, 10);
-  return lol;
-}
-
 class TmdbService {
   Future<List<Movie>> getTrendingMovies() async {
     String url = getURL('/trending/movie/day');
     try {
       var res = await http.get(Uri.parse(url), headers: headers);
       String resBody = utf8.decode(res.bodyBytes);
+      print({'status': res.statusCode, 'endpoint': 'getTrendingMovies'});
+
       return parseMovies(resBody);
     } catch (error) {
+      print("error in trending");
       return Future.error(error);
     }
   }
@@ -49,9 +40,13 @@ class TmdbService {
     String url = getURL('/movie/$id');
     try {
       var res = await http.get(Uri.parse(url), headers: headers);
-      Movie movie = jsonDecode(res.body);
+      String responseBody = utf8.decode(res.bodyBytes);
+      var json = jsonDecode(responseBody);
+      final movie = Movie.fromJson(json);
+      print({'status': res.statusCode, 'endpoint': 'requestMovie'});
       return movie;
     } catch (error) {
+      print("error in req movie");
       return Future.error(error);
     }
   }
@@ -59,10 +54,16 @@ class TmdbService {
   Future<List<Actor>> requestCredits(int id) async {
     String url = getURL("/movie/$id/credits");
     try {
-      var res = await http.get(Uri.parse(url), headers: headers);
-      String resBody = utf8.decode(res.bodyBytes);
-      return parseActors(resBody);
+      var response = await http.get(Uri.parse(url), headers: headers);
+      String responseBody = utf8.decode(response.bodyBytes);
+      var json = jsonDecode(responseBody);
+      var results = json['cast'];
+      var actors = (results as List).map((actor) {
+        return Actor.fromJson(actor);
+      });
+      return actors.toList().sublist(0, 10);
     } catch (error) {
+      print("error in credits");
       return Future.error(error);
     }
   }
@@ -72,8 +73,13 @@ class TmdbService {
     try {
       var response = await http.get(Uri.parse(url), headers: headers);
       String resBody = utf8.decode(response.bodyBytes);
+      print({
+        'status': response.statusCode,
+        'endpoint': 'requestRecommendations'
+      });
       return parseMovies(resBody);
     } catch (error) {
+      print("error in recommendations");
       return Future.error(error);
     }
   }
@@ -83,6 +89,7 @@ class TmdbService {
     try {
       var response = await http.get(Uri.parse(url), headers: headers);
       String resBody = utf8.decode(response.bodyBytes);
+      print({'status': response.statusCode, 'endpoint': 'requestSimilar'});
       return parseMovies(resBody);
     } catch (error) {
       return Future.error("Can not get Movie List data");
